@@ -174,7 +174,7 @@ switch ($action) {
         $stmt = $db->prepare('INSERT INTO picks (user_id, series_id, winner, games)
             VALUES (:uid, :sid, :winner, :games)
             ON CONFLICT(user_id, series_id) DO UPDATE SET
-                winner = :winner, games = :games, updated_at = datetime("now")');
+                winner = :winner, games = :games, updated_at = CURRENT_TIMESTAMP');
         $stmt->bindValue(':uid', $user['id'], SQLITE3_INTEGER);
         $stmt->bindValue(':sid', $seriesId, SQLITE3_INTEGER);
         $stmt->bindValue(':winner', $winner, SQLITE3_TEXT);

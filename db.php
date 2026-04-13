@@ -24,7 +24,7 @@ function initDB() {
         name TEXT UNIQUE NOT NULL COLLATE NOCASE,
         pin_hash TEXT NOT NULL,
         is_admin INTEGER DEFAULT 0,
-        created_at TEXT DEFAULT (datetime("now"))
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )');
 
     $db->exec('CREATE TABLE IF NOT EXISTS series (
@@ -46,8 +46,8 @@ function initDB() {
         series_id INTEGER NOT NULL,
         winner TEXT NOT NULL,
         games INTEGER NOT NULL,
-        created_at TEXT DEFAULT (datetime("now")),
-        updated_at TEXT DEFAULT (datetime("now")),
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id),
         FOREIGN KEY (series_id) REFERENCES series(id),
         UNIQUE(user_id, series_id)
