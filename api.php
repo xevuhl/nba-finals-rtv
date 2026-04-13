@@ -317,17 +317,7 @@ switch ($action) {
         }
         $stmt->execute();
 
-        // If finals teams need auto-populating from conf finals winners
-        if (isset($input['status']) && $input['status'] === 'completed') {
-            $eastWinner = $db->querySingle("SELECT actual_winner FROM series WHERE round = 'conf_finals' AND sort_order = 1");
-            $westWinner = $db->querySingle("SELECT actual_winner FROM series WHERE round = 'conf_finals' AND sort_order = 2");
-            if ($eastWinner && $westWinner) {
-                $stmt2 = $db->prepare("UPDATE series SET team1 = :t1, team2 = :t2 WHERE round = 'finals' AND team1 = '' AND team2 = ''");
-                $stmt2->bindValue(':t1', $eastWinner, SQLITE3_TEXT);
-                $stmt2->bindValue(':t2', $westWinner, SQLITE3_TEXT);
-                $stmt2->execute();
-            }
-        }
+        // Remove old auto-populate — admin manages teams manually through the panel
 
         jsonResponse(['success' => true]);
         break;

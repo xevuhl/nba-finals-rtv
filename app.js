@@ -153,15 +153,35 @@ async function loadMyPicks() {
 }
 
 function renderBracket() {
-    const confCards = $('#conf-finals-cards');
-    const finalsCards = $('#finals-cards');
-    confCards.innerHTML = '';
-    finalsCards.innerHTML = '';
+    // Map round names to container IDs
+    const containers = {
+        'first_round_west': '#first-round-west-cards',
+        'first_round_east': '#first-round-east-cards',
+        'conf_semis_west': '#conf-semis-west-cards',
+        'conf_semis_east': '#conf-semis-east-cards',
+        'conf_finals': null, // split by sort_order
+        'finals': '#finals-cards'
+    };
+
+    // Clear all containers
+    Object.values(containers).forEach(sel => {
+        if (sel) $(sel).innerHTML = '';
+    });
+    $('#conf-finals-west-cards').innerHTML = '';
+    $('#conf-finals-east-cards').innerHTML = '';
 
     bracket.forEach(s => {
         const card = createSeriesCard(s);
-        if (s.round === 'conf_finals') confCards.appendChild(card);
-        else finalsCards.appendChild(card);
+        if (s.round === 'conf_finals') {
+            // West conf finals has lower sort_order
+            if (s.label.toLowerCase().includes('west')) {
+                $('#conf-finals-west-cards').appendChild(card);
+            } else {
+                $('#conf-finals-east-cards').appendChild(card);
+            }
+        } else if (containers[s.round]) {
+            $(containers[s.round]).appendChild(card);
+        }
     });
 }
 

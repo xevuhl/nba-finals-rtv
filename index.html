@@ -50,17 +50,49 @@
 
         <!-- Bracket View -->
         <section id="view-bracket" class="view active">
-            <div class="bracket-container">
-                <div class="bracket-round" id="conf-finals">
-                    <h2>Conference Finals</h2>
-                    <div class="series-cards" id="conf-finals-cards"></div>
+            <div class="bracket-full">
+                <!-- West Side -->
+                <div class="conference-bracket west-bracket">
+                    <h2 class="conf-title west">Western Conference</h2>
+                    <div class="bracket-rounds">
+                        <div class="bracket-round">
+                            <h3>First Round</h3>
+                            <div class="series-cards" id="first-round-west-cards"></div>
+                        </div>
+                        <div class="bracket-round">
+                            <h3>Conf. Semis</h3>
+                            <div class="series-cards" id="conf-semis-west-cards"></div>
+                        </div>
+                        <div class="bracket-round">
+                            <h3>Conf. Finals</h3>
+                            <div class="series-cards" id="conf-finals-west-cards"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="bracket-connector">
-                    <div class="connector-line"></div>
-                </div>
-                <div class="bracket-round" id="finals">
-                    <h2>NBA Finals</h2>
+
+                <!-- Finals -->
+                <div class="finals-bracket">
+                    <h2 class="conf-title finals">NBA Finals</h2>
                     <div class="series-cards" id="finals-cards"></div>
+                </div>
+
+                <!-- East Side -->
+                <div class="conference-bracket east-bracket">
+                    <h2 class="conf-title east">Eastern Conference</h2>
+                    <div class="bracket-rounds">
+                        <div class="bracket-round">
+                            <h3>First Round</h3>
+                            <div class="series-cards" id="first-round-east-cards"></div>
+                        </div>
+                        <div class="bracket-round">
+                            <h3>Conf. Semis</h3>
+                            <div class="series-cards" id="conf-semis-east-cards"></div>
+                        </div>
+                        <div class="bracket-round">
+                            <h3>Conf. Finals</h3>
+                            <div class="series-cards" id="conf-finals-east-cards"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
