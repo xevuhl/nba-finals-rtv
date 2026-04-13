@@ -64,5 +64,10 @@ function initDB() {
     }
 }
 
-initDB();
+try {
+    initDB();
+} catch (Throwable $e) {
+    // Let api.php handle the error
+    throw $e;
+}
 

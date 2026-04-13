@@ -1,7 +1,11 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', '0');
-ob_start();
+
+// Custom error handler to convert warnings/notices to JSON
+set_error_handler(function($severity, $message, $file, $line) {
+    throw new ErrorException($message, 0, $severity, $file, $line);
+});
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -13,23 +17,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-try {
-    require_once __DIR__ . '/db.php';
-} catch (Throwable $e) {
-    ob_end_clean();
-    http_response_code(500);
-    echo json_encode(['error' => 'Database initialization failed: ' . $e->getMessage()]);
+$action = isset($_GET['action']) ? $_GET['action'] : '';
+
+// Ping doesn't need DB — useful for diagnosing server issues
+if ($action === 'ping') {
+    echo json_encode([
+        'status' => 'ok',
+        'php' => PHP_VERSION,
+        'sqlite3_available' => class_exists('SQLite3'),
+        'data_dir_writable' => is_writable(__DIR__ . '/data'),
+    ]);
     exit;
 }
 
-// Discard any output from db init (warnings, notices)
-ob_end_clean();
+// Check SQLite3 before attempting to use it
+if (!class_exists('SQLite3')) {
+    http_response_code(500);
+    echo json_encode(['error' => 'SQLite3 extension is not enabled. Contact your hosting provider to enable it via PHP settings.']);
+    exit;
+}
 
-$action = $_GET['action'] ?? '';
+try {
+    require_once __DIR__ . '/db.php';
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+    exit;
+}
+
 $db = getDB();
 
 function jsonResponse($data, $code = 200) {
-    if (ob_get_level()) ob_end_clean();
     http_response_code($code);
     echo json_encode($data);
     exit;
@@ -61,16 +79,6 @@ function requireAuth($db) {
 }
 
 switch ($action) {
-
-    // ── Health check ──
-    case 'ping':
-        jsonResponse([
-            'status' => 'ok',
-            'php' => PHP_VERSION,
-            'sqlite' => class_exists('SQLite3') ? SQLite3::version()['versionString'] : 'not available',
-            'db_writable' => is_writable(dirname(DB_PATH))
-        ]);
-        break;
 
     // ── Register ──
     case 'register':
