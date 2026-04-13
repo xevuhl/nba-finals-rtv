@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Playoff Bracket – Pick Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal active">
+        <div class="modal-content">
+            <div class="logo">🏀</div>
+            <h1>NBA Playoff Picks</h1>
+            <p class="subtitle">Conference Finals → NBA Finals</p>
+            <div class="auth-tabs">
+                <button class="tab active" data-tab="login">Sign In</button>
+                <button class="tab" data-tab="register">Register</button>
+            </div>
+            <form id="auth-form">
+                <input type="text" id="auth-name" placeholder="Your name" maxlength="30" required autocomplete="username">
+                <input type="password" id="auth-pin" placeholder="PIN (4+ characters)" maxlength="20" required autocomplete="current-password">
+                <button type="submit" class="btn primary" id="auth-btn">Sign In</button>
+                <p id="auth-error" class="error"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="hidden">
+        <header>
+            <div class="header-left">
+                <span class="logo-sm">🏀</span>
+                <h1>Playoff Picks</h1>
+            </div>
+            <div class="header-right">
+                <span id="user-name" class="user-badge"></span>
+                <button id="admin-btn" class="btn small hidden">Admin</button>
+                <button id="logout-btn" class="btn small outline">Logout</button>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="tab-bar">
+            <button class="tab-btn active" data-view="bracket">Bracket</button>
+            <button class="tab-btn" data-view="picks">All Picks</button>
+            <button class="tab-btn" data-view="leaderboard">Leaderboard</button>
+        </nav>
+
+        <!-- Bracket View -->
+        <section id="view-bracket" class="view active">
+            <div class="bracket-container">
+                <div class="bracket-round" id="conf-finals">
+                    <h2>Conference Finals</h2>
+                    <div class="series-cards" id="conf-finals-cards"></div>
+                </div>
+                <div class="bracket-connector">
+                    <div class="connector-line"></div>
+                </div>
+                <div class="bracket-round" id="finals">
+                    <h2>NBA Finals</h2>
+                    <div class="series-cards" id="finals-cards"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- All Picks View -->
+        <section id="view-picks" class="view hidden">
+            <div class="picks-container" id="picks-grid"></div>
+        </section>
+
+        <!-- Leaderboard View -->
+        <section id="view-leaderboard" class="view hidden">
+            <div class="leaderboard-container" id="leaderboard-table"></div>
+        </section>
+    </div>
+
+    <!-- Pick Modal -->
+    <div id="pick-modal" class="modal">
+        <div class="modal-content pick-modal-content">
+            <button class="modal-close" id="pick-close">&times;</button>
+            <h2 id="pick-title"></h2>
+            <div class="matchup-display">
+                <button class="team-pick" id="pick-team1"></button>
+                <span class="vs">VS</span>
+                <button class="team-pick" id="pick-team2"></button>
+            </div>
+            <div class="games-select">
+                <label>Series ends in:</label>
+                <div class="games-options">
+                    <button class="game-btn" data-games="4">4</button>
+                    <button class="game-btn" data-games="5">5</button>
+                    <button class="game-btn" data-games="6">6</button>
+                    <button class="game-btn" data-games="7">7</button>
+                </div>
+                <span class="games-label">games</span>
+            </div>
+            <button class="btn primary full-width" id="submit-pick" disabled>Submit Pick</button>
+        </div>
+    </div>
+
+    <!-- Admin Modal -->
+    <div id="admin-modal" class="modal">
+        <div class="modal-content admin-modal-content">
+            <button class="modal-close" id="admin-close">&times;</button>
+            <h2>Admin Panel</h2>
+            <div id="admin-series-list"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
