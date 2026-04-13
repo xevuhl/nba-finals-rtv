@@ -1,5 +1,7 @@
 <?php
-require_once __DIR__ . '/db.php';
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
+ob_start();
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -11,10 +13,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+try {
+    require_once __DIR__ . '/db.php';
+} catch (Throwable $e) {
+    ob_end_clean();
+    http_response_code(500);
+    echo json_encode(['error' => 'Database initialization failed: ' . $e->getMessage()]);
+    exit;
+}
+
+// Discard any output from db init (warnings, notices)
+ob_end_clean();
+
 $action = $_GET['action'] ?? '';
 $db = getDB();
 
 function jsonResponse($data, $code = 200) {
+    if (ob_get_level()) ob_end_clean();
     http_response_code($code);
     echo json_encode($data);
     exit;
@@ -46,6 +61,16 @@ function requireAuth($db) {
 }
 
 switch ($action) {
+
+    // ── Health check ──
+    case 'ping':
+        jsonResponse([
+            'status' => 'ok',
+            'php' => PHP_VERSION,
+            'sqlite' => class_exists('SQLite3') ? SQLite3::version()['versionString'] : 'not available',
+            'db_writable' => is_writable(dirname(DB_PATH))
+        ]);
+        break;
 
     // ── Register ──
     case 'register':

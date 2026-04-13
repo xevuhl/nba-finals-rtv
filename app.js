@@ -18,7 +18,14 @@ async function api(action, body = null) {
         opts.body = JSON.stringify(body);
     }
     const res = await fetch(`${API}?action=${action}`, opts);
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+        data = JSON.parse(text);
+    } catch (e) {
+        console.error('API response not JSON:', text);
+        throw new Error('Server error — check that PHP and SQLite are enabled on your host');
+    }
     if (!res.ok) throw new Error(data.error || 'Request failed');
     return data;
 }
@@ -41,15 +48,29 @@ $('#auth-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = $('#auth-name').value.trim();
     const pin = $('#auth-pin').value;
-    $('#auth-error').textContent = '';
+    const errorEl = $('#auth-error');
+    errorEl.textContent = '';
+
+    if (!name || !pin) {
+        errorEl.textContent = 'Please enter both name and PIN.';
+        return;
+    }
+
+    const btn = $('#auth-btn');
+    btn.disabled = true;
+    btn.textContent = 'Loading...';
 
     try {
-        const data = await api(authMode === 'login' ? 'login' : 'register', { name, pin });
-        currentUser = { name: data.name, pin, is_admin: data.is_admin };
+        const action = authMode === 'login' ? 'login' : 'register';
+        const data = await api(action, { name, pin });
+        currentUser = { name: data.name, pin, is_admin: !!data.is_admin };
         sessionStorage.setItem('user', JSON.stringify(currentUser));
-        showApp();
+        await showApp();
     } catch (err) {
-        $('#auth-error').textContent = err.message;
+        errorEl.textContent = err.message;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = authMode === 'login' ? 'Sign In' : 'Register';
     }
 });
 
@@ -78,10 +99,20 @@ async function showApp() {
 
     if (currentUser.is_admin) {
         $('#admin-btn').classList.remove('hidden');
+    } else {
+        $('#admin-btn').classList.add('hidden');
     }
 
-    await loadBracket();
-    await loadMyPicks();
+    try {
+        await loadBracket();
+    } catch (err) {
+        console.error('Failed to load bracket:', err);
+    }
+    try {
+        await loadMyPicks();
+    } catch (err) {
+        console.error('Failed to load picks:', err);
+    }
 }
 
 // ── Tab Navigation ──
@@ -90,9 +121,9 @@ $$('.tab-btn').forEach(btn => {
         $$('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         $$('.view').forEach(v => v.classList.add('hidden'));
-        v = $(`#view-${btn.dataset.view}`);
-        v.classList.remove('hidden');
-        v.classList.add('active');
+        const target = $(`#view-${btn.dataset.view}`);
+        target.classList.remove('hidden');
+        target.classList.add('active');
 
         if (btn.dataset.view === 'picks') loadAllPicks();
         if (btn.dataset.view === 'leaderboard') loadLeaderboard();
